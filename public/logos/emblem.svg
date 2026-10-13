@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240"><defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#F4DD8A"/><stop offset="0.45" stop-color="#D4AF37"/>
+    <stop offset="1" stop-color="#9A6B1F"/></linearGradient></defs><g transform="translate(120 120) scale(1.1)">
+  <defs><clipPath id="c"><circle r="97"/></clipPath>
+  <clipPath id="geo"><path d="M 12,-125 C -35,-60 62,-22 22,32 C -8,74 52,96 70,125 L 130,125 L 130,-125 Z"/></clipPath></defs>
+  <circle r="98" fill="none" stroke="url(#gold)" stroke-width="3.4"/>
+  <g clip-path="url(#c)" fill="none" stroke="url(#gold)" stroke-linecap="round">
+    <path d="M 12,-125 C -35,-60 62,-22 22,32 C -8,74 52,96 70,125" stroke-width="2.5"/><path d="M 1,-125 C -46,-60 51,-22 11,32 C -19,74 41,96 59,125" stroke-width="1.5"/><path d="M -10,-125 C -57,-60 40,-22 0,32 C -30,74 30,96 48,125" stroke-width="1.5"/><path d="M -21,-125 C -68,-60 29,-22 -11,32 C -41,74 19,96 37,125" stroke-width="2.5"/><path d="M -32,-125 C -79,-60 18,-22 -22,32 C -52,74 8,96 26,125" stroke-width="1.5"/><path d="M -43,-125 C -90,-60 7,-22 -33,32 C -63,74 -3,96 15,125" stroke-width="1.5"/><path d="M -54,-125 C -101,-60 -4,-22 -44,32 C -74,74 -14,96 4,125" stroke-width="2.5"/><path d="M -65,-125 C -112,-60 -15,-22 -55,32 C -85,74 -25,96 -7,125" stroke-width="1.5"/><path d="M -76,-125 C -123,-60 -26,-22 -66,32 C -96,74 -36,96 -18,125" stroke-width="1.5"/><path d="M -87,-125 C -134,-60 -37,-22 -77,32 C -107,74 -47,96 -29,125" stroke-width="2.5"/><path d="M -98,-125 C -145,-60 -48,-22 -88,32 C -118,74 -58,96 -40,125" stroke-width="1.5"/><path d="M -109,-125 C -156,-60 -59,-22 -99,32 C -129,74 -69,96 -51,125" stroke-width="1.5"/><path d="M -120,-125 C -167,-60 -70,-22 -110,32 C -140,74 -80,96 -62,125" stroke-width="2.5"/><path d="M -131,-125 C -178,-60 -81,-22 -121,32 C -151,74 -91,96 -73,125" stroke-width="1.5"/>
+    <g clip-path="url(#geo)" opacity="0.75">
+    <ellipse cx="62" cy="0" rx="50" ry="98" stroke-width="1.4"/>
+    <ellipse cx="62" cy="0" rx="22" ry="98" stroke-width="1.4"/>
+    <path d="M 62,-98 L 62,98" stroke-width="1.4"/>
+    <path d="M 0,-58 Q 62,-72 120,-58" stroke-width="1.4"/>
+    <path d="M 0,58 Q 62,72 120,58" stroke-width="1.4"/>
+    <path d="M 0,0 L 120,0" stroke-width="1.4"/></g>
+  </g></g></svg>

@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html { scroll-behavior: smooth; }
+body { @apply bg-ivory font-sans text-ink antialiased; }
+::selection { background: #D4AF37; color: #0F1113; }
+
+@layer components {
+  .gold-text {
+    background: linear-gradient(100deg, #9A7620 0%, #E6CB62 35%, #D4AF37 55%, #9A7620 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .gold-text-anim { animation: shimmer 6s linear infinite; }
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-sm font-medium tracking-wide text-ink transition-all duration-300 hover:-translate-y-0.5 hover:shadow-gold;
+    background: linear-gradient(120deg, #E6CB62, #D4AF37 50%, #B8922A);
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border px-7 py-3.5 text-sm font-medium tracking-wide transition-all duration-300 hover:-translate-y-0.5;
+  }
+  .eyebrow { @apply text-[11px] font-medium uppercase tracking-[0.32em] text-gold-600; }
+  .container-x { @apply mx-auto w-full max-w-7xl px-5 sm:px-8; }
+}
+
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity .9s ease, transform .9s cubic-bezier(.2,.7,.2,1); }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  * { animation: none !important; }
+}
+
+@keyframes flow { to { stroke-dashoffset: -44; } }
+.flow { stroke-dasharray: 5 7; animation: flow 3s linear infinite; }
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+.spin-slow { animation: spin-slow 80s linear infinite; transform-origin: center; }
