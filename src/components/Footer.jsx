@@ -18,13 +18,13 @@ export default function Footer() {
               Ready to stock <span className="gold-text gold-text-anim italic">original human hair</span>?
             </h2>
           </div>
-          <a href={waLink(DEFAULT_WA_MESSAGE)} target="_blank" rel="noopener noreferrer" className="btn-gold">
+          <a href={waLink(DEFAULT_WA_MESSAGE)} target="_blank" rel="noopener noreferrer" className="btn-gold shrink-0 whitespace-nowrap">
             <WhatsAppIcon size={18} /> Start a WhatsApp enquiry
           </a>
         </div>
 
-        <div className="grid gap-12 pt-12 md:grid-cols-12">
-          <div className="md:col-span-4">
+        <div className="grid gap-x-8 gap-y-12 pt-12 md:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1.3fr]">
+          <div className="md:order-1">
             <img src={company.logos.horizontal} alt={`${company.name} logo`} className="h-12 w-auto" />
             <p className="mt-5 max-w-sm text-sm leading-relaxed">{company.shortDescription}</p>
             <div className="mt-6 flex gap-3">
@@ -37,7 +37,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="md:col-span-2">
+          <div className="md:order-3 lg:order-2">
             <h3 className="eyebrow !text-gold-300">Explore</h3>
             <ul className="mt-5 space-y-3 text-sm">
               {[...company.nav, { label: 'Wholesale Enquiry', to: '/wholesale-enquiry' }].map((n) => (
@@ -46,7 +46,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className="md:col-span-2">
+          <div className="md:order-4 lg:order-3">
             <h3 className="eyebrow !text-gold-300">Products</h3>
             <ul className="mt-5 space-y-3 text-sm">
               {company.products.slice(0, 6).map((p) => (
@@ -55,7 +55,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className="md:col-span-4">
+          <div className="md:order-2 lg:order-4">
             <h3 className="eyebrow !text-gold-300">Reach us</h3>
             <ul className="mt-5 space-y-4 text-sm">
               <li className="flex gap-3"><PinIcon className="mt-0.5 shrink-0 text-gold-400" /><a href={company.mapUrl} target="_blank" rel="noopener noreferrer" className="hover:text-gold-300">{company.address.full}</a></li>
@@ -66,9 +66,10 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-6 text-xs text-white/50 sm:flex-row sm:items-center">
+        <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-6 text-xs text-white/50 sm:flex-row sm:items-center sm:pr-20">
           <p>© {year} {company.legalName}. All rights reserved.</p>
-          <p>{company.tagline} · <a href={company.url} className="hover:text-gold-300">{company.domain}</a></p>
+          <p>{company.tagline}</p>
+          <p> <a href="https://pathansapple.com" className="hover:text-gold-300">Powered by Pathans Apple Info Tech</a></p>
         </div>
       </div>
     </footer>

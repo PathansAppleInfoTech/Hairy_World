@@ -1,241 +1,527 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+
 import SEO from '../components/SEO';
 import useReveal from '../hooks/useReveal';
 import company, { waLink, DEFAULT_WA_MESSAGE } from '../data/companyData';
-import { ArrowIcon, WhatsAppIcon, CheckIcon, ShieldIcon, ScissorsIcon, TagIcon, TruckIcon, GlobeIcon } from '../components/Icons';
+import {
+  ArrowIcon,
+  WhatsAppIcon,
+  CheckIcon,
+  ShieldIcon,
+  ScissorsIcon,
+  TagIcon,
+  TruckIcon,
+  GlobeIcon,
+} from '../components/Icons';
 
-/* ───────── small local helpers ───────── */
-function Counter({ to, suffix = '' }) {
-  const ref = useRef(null);
-  const [n, setN] = useState(0);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return;
-      io.disconnect();
-      const start = performance.now();
-      const dur = 1600;
-      const tick = (t) => {
-        const p = Math.min(1, (t - start) / dur);
-        setN(Math.round(to * (1 - Math.pow(1 - p, 3))));
-        if (p < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-    }, { threshold: 0.4 });
-    io.observe(el);
-    return () => io.disconnect();
-  }, [to]);
-  return <span ref={ref}>{n}{suffix}</span>;
-}
+const unsplash = (photo, width = 1200, height = 900) =>
+  `https://images.unsplash.com/${photo}?auto=format&fit=crop&w=${width}&h=${height}&q=82`;
+
+const images = {
+  hero: '/images/hero.png',
+  story: '/images/story.png',
+  detail: '/images/detail.png',
+  texture: '/images/texture.png',
+  waves: '/images/waves.png',
+  raw: '/images/raw-supply.png',
+  ready: '/images/ready-to-use.png',
+  specialty:'/images/speciality.png',
+  salon: 'images/salon.png',
+};
 
 const groups = ['Raw Supply', 'Ready-to-use', 'Specialty'];
+
 const groupMeta = {
-  'Raw Supply': { img: '/images/bundles-silk.jpg', line: 'The foundation of every extension: bulk, single drawn and double drawn hair, sorted and supplied in wholesale volume.' },
-  'Ready-to-use': { img: '/images/bundles-clip.jpg', line: 'Finished clip-ins, clip-ons, ponytails, buns, clutch and tail pieces, stitched in-house and ready for your shelves.' },
-  Specialty: { img: '/images/bundles-natural.jpg', line: 'Tiruppan, wrapped extensions and made-to-order pieces built to your exact brief by our stitching unit.' },
+  'Raw Supply': {
+    img: images.raw,
+    alt: 'Beauty editorial photograph representing natural human hair products',
+    eyebrow: 'The essentials',
+    line: 'The foundation of every extension: bulk, single-drawn and double-drawn hair for businesses buying wholesale quantities.',
+  },
+  'Ready-to-use': {
+    img: images.ready,
+    alt: 'Fashion and hair styling editorial image',
+    eyebrow: 'Ready for styling',
+    line: 'Finished clip-ins, clip-ons, ponytails, buns, clutch and tail pieces, stitched in-house and prepared for your product range.',
+  },
+  Specialty: {
+    img: images.specialty,
+    alt: 'Close-up beauty portrait with styled hair',
+    eyebrow: 'Made to your brief',
+    line: 'Tiruppan, wrapped extensions and made-to-order pieces created to suit your product specifications.',
+  },
 };
 
 const steps = [
-  { t: 'Enquire', d: 'Message us on WhatsApp with what you stock and your volumes.', Icon: WhatsAppIcon },
-  { t: 'Select & Sample', d: 'Choose texture, length and product type. Samples on request.', Icon: TagIcon },
-  { t: 'Stitch & Customize', d: 'Our own unit produces to your specification.', Icon: ScissorsIcon },
-  { t: 'Quality Check', d: 'Every batch is checked before it is packed.', Icon: ShieldIcon },
-  { t: 'Dispatch', d: 'Packed and shipped across India and overseas.', Icon: TruckIcon },
+  { t: 'Tell us what you need', d: 'Share the product type, preferred length, texture, quantity and destination.', Icon: WhatsAppIcon },
+  { t: 'Select your range', d: 'Discuss available options and request samples where appropriate.', Icon: TagIcon },
+  { t: 'Custom stitching', d: 'Our own stitching unit supports agreed product specifications.', Icon: ScissorsIcon },
+  { t: 'Quality review', d: 'Orders are checked and prepared before packing and dispatch.', Icon: ShieldIcon },
+  { t: 'Dispatch', d: 'We coordinate supply for customers across India and international markets.', Icon: TruckIcon },
 ];
 
 const faqs = [
-  { q: 'Do you sell only to businesses?', a: 'Yes. Hairy World is a wholesale supplier. We work with wholesalers, salons, distributors, retailers, exporters and hair extension brands. Contact us on WhatsApp for wholesale rates.' },
-  { q: 'Is the hair 100% original human hair?', a: 'Yes. Everything we supply is original human hair, and we are happy to discuss texture, length and finish for your order.' },
-  { q: 'Can you make custom hair extensions to my specification?', a: 'Yes. We have our own stitching unit in Kerala, so clip-ins, ponytails, buns, wrapped extensions and other pieces can be made to your brief.' },
-  { q: 'Which countries do you export to?', a: 'We supply GCC countries, the UK, USA, Canada and other international markets, as well as buyers across India.' },
-  { q: 'How do I place a wholesale enquiry?', a: 'Tap any WhatsApp button on this site, or use the wholesale enquiry form. Tell us your product, quantity and country and we will reply with details.' },
+  {
+    q: 'Do you sell only to businesses?',
+    a: 'Hairy World focuses on wholesale supply for salons, wholesalers, distributors, retailers, exporters and hair extension brands. Contact us for product details and wholesale pricing.',
+  },
+  {
+    q: 'What types of human hair products do you offer?',
+    a: 'Our range includes bulk human hair, single-drawn and double-drawn hair, clip-on and clip-in extensions, ponytails, hair buns, clutch hair, tail extensions, Tiruppan, wrapped extensions and customised products.',
+  },
+  {
+    q: 'Can you make products to our specifications?',
+    a: 'Yes. Hairy World has its own stitching unit and can discuss customised products and specifications based on your requirements.',
+  },
+  {
+    q: 'Which markets do you serve?',
+    a: 'We serve customers across India and international markets including GCC countries, the UK, the USA and Canada. Contact us to discuss your destination and order requirements.',
+  },
+  {
+    q: 'How do I request wholesale rates?',
+    a: 'Message us on WhatsApp with the product you are interested in, approximate quantity and destination country. Our team can then share relevant information.',
+  },
 ];
+
+const reasons = [
+  {
+    no: '01',
+    title: '15+ years of experience',
+    text: 'Industry experience informs how we discuss product choices, specifications and wholesale needs.',
+  },
+  {
+    no: '02',
+    title: 'Our own stitching unit',
+    text: 'In-house stitching provides more flexibility when discussing custom products and finishes.',
+  },
+  {
+    no: '03',
+    title: 'Wholesale-first approach',
+    text: 'We work with businesses looking for a dependable product range and practical supply conversations.',
+  },
+  {
+    no: '04',
+    title: 'International supply',
+    text: 'We support enquiries from India, GCC markets, the UK, the USA, Canada and beyond.',
+  },
+];
+
+function SectionEyebrow({ children, light = false }) {
+  return (
+    <p className={`flex items-center gap-3 text-[0.68rem] font-semibold uppercase tracking-[0.24em] ${light ? 'text-[#e8c77d]' : 'text-[#94702d]'}`}>
+      <span className={`h-px w-8 ${light ? 'bg-[#e8c77d]' : 'bg-[#b8924b]'}`} aria-hidden="true" />
+      {children}
+    </p>
+  );
+}
 
 export default function Home() {
   useReveal();
   const [tab, setTab] = useState(groups[0]);
-  const [open, setOpen] = useState(0);
-  const list = company.products.filter((p) => p.group === tab);
+  const [openFaq, setOpenFaq] = useState(0);
+
+  const products = company.products ?? [];
+  const activeProducts = products.filter((product) => product.group === tab);
+  const buyers = company.buyers ?? ['Salons', 'Wholesalers', 'Distributors', 'Retailers'];
+  const whyUs = company.whyUs?.length ? company.whyUs : reasons.map((reason) => ({ title: reason.title, text: reason.text }));
 
   const faqSchema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.q,
+      acceptedAnswer: { '@type': 'Answer', text: faq.a },
+    })),
   };
 
   return (
     <>
       <SEO path="/" schema={faqSchema} />
 
-      {/* ═════════ 1. HERO ═════════ */}
-      <section className="relative overflow-hidden bg-ivory">
-        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-          <div className="absolute -left-40 -top-40 h-[620px] w-[620px] rounded-full bg-gold-200/40 blur-3xl" />
-          <div className="absolute -bottom-52 right-0 h-[560px] w-[560px] rounded-full bg-gold-100/70 blur-3xl" />
-          <svg className="absolute left-0 top-0 h-full w-full opacity-[0.14]" viewBox="0 0 1200 800" preserveAspectRatio="none">
-            {Array.from({ length: 9 }).map((_, i) => (
-              <path key={i} d={`M -50,${120 + i * 70} C 250,${20 + i * 70} 450,${260 + i * 70} 700,${140 + i * 70} S 1100,${40 + i * 70} 1260,${160 + i * 70}`} fill="none" stroke="#B8922A" strokeWidth="1" />
-            ))}
-          </svg>
-        </div>
+      {/* Full-width editorial hero */}
+      <section className="relative isolate flex min-h-[690px] items-center overflow-hidden bg-[#141210] text-white sm:min-h-[740px] lg:min-h-[790px]">
+        <img
+          src={images.hero}
+          alt="Beauty editorial portrait representing premium hair styling"
+          width="2200"
+          height="1500"
+          fetchPriority="high"
+          decoding="async"
+          className="absolute inset-0 -z-30 h-full w-full object-cover object-[center_34%]"
+        />
+        <div className="absolute inset-0 -z-20 bg-[linear-gradient(90deg,rgba(12,11,10,0.96)_0%,rgba(12,11,10,0.85)_39%,rgba(12,11,10,0.47)_70%,rgba(12,11,10,0.32)_100%)]" />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(0deg,rgba(12,11,10,0.76)_0%,transparent_42%,rgba(12,11,10,0.18)_100%)]" />
+        <div className="pointer-events-none absolute -left-40 top-20 -z-10 h-96 w-96 rounded-full bg-[#b58a3b]/15 blur-3xl" />
 
-        <div className="container-x relative grid items-center gap-12 py-14 sm:py-20 lg:grid-cols-12 lg:py-24">
-          <div className="lg:col-span-7">
-            <p className="eyebrow flex items-center gap-3"><span className="h-px w-10 bg-gold-500" />Wholesale human hair · Alappuzha, Kerala</p>
-            <h1 className="mt-6 font-display text-[2.7rem] font-semibold leading-[1.02] text-ink sm:text-6xl lg:text-[4.6rem]">
-              Original human hair,<br />
-              supplied <span className="gold-text gold-text-anim italic">to the world's</span><br />
-              hair businesses.
-            </h1>
-            <p className="mt-7 max-w-xl text-base leading-relaxed text-ink/70 sm:text-lg">
-              {company.name} is a wholesale human hair supplier and exporter with {company.yearsExperience}+ years in the trade. Bulk hair, drawn hair and ready-made extensions, stitched in our own unit and shipped to salons, wholesalers and distributors worldwide.
-            </p>
-            <div className="mt-9 flex flex-wrap items-center gap-4">
-              <a href={waLink(DEFAULT_WA_MESSAGE)} target="_blank" rel="noopener noreferrer" className="btn-gold"><WhatsAppIcon size={18} /> Get wholesale rates</a>
-              <Link to="/products" className="btn-ghost border-ink/20 text-ink hover:border-gold-500 hover:text-gold-600">Explore products <ArrowIcon width={16} height={16} /></Link>
+        <div className="container-x relative grid w-full items-center gap-12 py-24 sm:py-28 lg:grid-cols-12 lg:gap-10 lg:py-32">
+          <div className="max-w-3xl lg:col-span-8">
+            <div className="inline-flex items-center gap-3 rounded-full border border-white/20 bg-black/25 px-4 py-2 backdrop-blur-sm">
+              <span className="h-2 w-2 rounded-full bg-[#e7c77e] shadow-[0_0_16px_rgba(231,199,126,0.8)]" />
+              <span className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-white/90">Human hair wholesale · Kerala, India</span>
             </div>
-            <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-sm text-ink/70">
-              {['100% original human hair', 'Own stitching unit', 'Export to GCC · UK · USA · Canada'].map((t) => (
-                <li key={t} className="flex items-center gap-2"><CheckIcon width={16} height={16} className="text-gold-500" />{t}</li>
+
+            <h1 className="mt-7 max-w-4xl font-display text-[2.75rem] font-semibold leading-[0.98] tracking-[-0.035em] text-white sm:text-6xl lg:text-[5.4rem]">
+              A better source for <span className="italic text-[#e8c77d]">beautiful hair.</span>
+            </h1>
+            <p className="mt-7 max-w-2xl text-base leading-7 text-white/78 sm:text-lg sm:leading-8">
+              {company.name} supplies original human hair and ready-to-use extensions to salons, wholesalers, distributors and retailers—with 15+ years of experience and an in-house stitching unit.
+            </p>
+
+            <div className="mt-9 flex flex-wrap gap-3 sm:gap-4">
+              <a
+                href={waLink(DEFAULT_WA_MESSAGE)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#d6b267] px-6 py-3 text-sm font-semibold text-[#19150f] shadow-[0_12px_35px_rgba(0,0,0,0.25)] transition duration-300 hover:-translate-y-0.5 hover:bg-[#efda9e] focus:outline-none focus:ring-2 focus:ring-[#f4dc9e] focus:ring-offset-2 focus:ring-offset-[#141210]"
+              >
+                <WhatsAppIcon size={18} /> Request wholesale rates
+              </a>
+              <Link
+                to="/products"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/45 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition duration-300 hover:border-[#e8c77d] hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[#f4dc9e]"
+              >
+                Explore our range <ArrowIcon width={16} height={16} />
+              </Link>
+            </div>
+
+            <ul className="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-sm text-white/85 sm:gap-x-8">
+              {['Original human hair', 'In-house stitching', 'Wholesale & export'].map((label) => (
+                <li key={label} className="flex items-center gap-2">
+                  <CheckIcon width={16} height={16} className="shrink-0 text-[#e8c77d]" />
+                  {label}
+                </li>
               ))}
             </ul>
           </div>
 
-          <div className="relative mx-auto w-full max-w-md lg:col-span-5 lg:max-w-none">
-            <div className="relative mx-auto aspect-[4/5] w-[88%] overflow-hidden rounded-t-[999px] rounded-b-[2rem] border border-gold-300 bg-ink p-2 shadow-lift">
-              <img src="/images/model-black.jpg" alt="Model with long wavy black human hair extensions" width="564" height="664" className="h-full w-full rounded-t-[999px] rounded-b-[1.5rem] object-cover" />
-            </div>
-            <div className="absolute -bottom-6 -left-2 h-36 w-36 overflow-hidden rounded-full border-[6px] border-ivory shadow-lift sm:h-44 sm:w-44">
-              <img src="/images/bundles-silk.jpg" alt="Bundles of raw human hair on silk" loading="lazy" className="h-full w-full object-cover" />
-            </div>
-            <div className="absolute right-0 top-8 animate-floaty rounded-2xl border border-gold-200 bg-white px-4 py-3 shadow-lift">
-              <p className="font-display text-3xl font-semibold leading-none gold-text">{company.yearsExperience}+</p>
-              <p className="mt-1 text-[11px] uppercase tracking-widest text-ink/60">Years of trust</p>
-            </div>
-            <div className="absolute -right-1 bottom-14 rounded-full bg-ink px-4 py-2 text-[11px] font-medium uppercase tracking-[0.2em] text-gold-300 shadow-lift">100% Original</div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═════════ 2. MARQUEE ═════════ */}
-      <section aria-label="Product range" className="overflow-hidden border-y border-gold-500/30 bg-gradient-to-r from-gold-500 via-gold-300 to-gold-500 py-4">
-        <div className="flex w-max animate-marquee whitespace-nowrap">
-          {[...company.products, ...company.products].map((p, i) => (
-            <span key={i} className="mx-6 flex items-center gap-6 font-display text-xl font-semibold text-ink sm:text-2xl">
-              {p.name}<span className="h-1.5 w-1.5 rotate-45 bg-ink/70" />
-            </span>
-          ))}
-        </div>
-      </section>
-
-      {/* ═════════ 3. WHO WE ARE (editorial + counters) ═════════ */}
-      <section className="bg-white py-20 sm:py-28">
-        <div className="container-x grid gap-14 lg:grid-cols-12">
-          <div className="reveal lg:col-span-5">
-            <p className="eyebrow">Who we are</p>
-            <p className="mt-4 font-display text-[7rem] font-semibold leading-none gold-text sm:text-[10rem]">15<span className="text-5xl align-top sm:text-7xl">+</span></p>
-            <p className="-mt-2 font-display text-2xl italic text-ink/70">years inside the hair trade</p>
-          </div>
-          <div className="reveal lg:col-span-7">
-            <h2 className="font-display text-3xl font-semibold leading-tight sm:text-5xl">A wholesale partner, not a middleman.</h2>
-            <p className="mt-6 text-base leading-relaxed text-ink/70 sm:text-lg">
-              From our base in Alappuzha we source, sort, stitch and ship human hair for businesses that depend on consistency. Because we run our own stitching unit, the hair you order is made the way you need it, not whatever a third party had in stock.
-            </p>
-            <Link to="/about" className="mt-6 inline-flex items-center gap-2 border-b border-gold-500 pb-1 text-sm font-medium uppercase tracking-widest text-gold-600 hover:gap-3 transition-all">Read our story <ArrowIcon width={16} height={16} /></Link>
-            <dl className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-gold-200 bg-gold-200 sm:grid-cols-4">
-              {company.stats.map((s) => (
-                <div key={s.label} className="bg-ivory p-5 sm:p-6">
-                  <dt className="sr-only">{s.label}</dt>
-                  <dd className="font-display text-4xl font-semibold text-ink"><Counter to={s.value} suffix={s.suffix} /></dd>
-                  <p className="mt-1 text-xs leading-snug text-ink/60">{s.label}</p>
+          <aside className="hidden lg:col-span-4 lg:block" aria-label="Hairy World at a glance">
+            <div className="ml-auto max-w-[310px] rounded-[1.75rem] border border-white/20 bg-[#171512]/65 p-6 shadow-2xl backdrop-blur-md xl:max-w-[340px]">
+              <div className="flex items-center justify-between gap-4 border-b border-white/15 pb-5">
+                <div>
+                  <p className="font-display text-5xl font-semibold leading-none text-[#e8c77d]">15<span className="text-3xl">+</span></p>
+                  <p className="mt-2 text-xs uppercase tracking-[0.18em] text-white/65">Years of experience</p>
                 </div>
-              ))}
-            </dl>
-          </div>
-        </div>
-      </section>
-
-      {/* ═════════ 4. RANGE (tabbed showcase) ═════════ */}
-      <section className="bg-ivory-deep py-20 sm:py-28">
-        <div className="container-x">
-          <div className="reveal flex flex-col justify-between gap-6 md:flex-row md:items-end">
-            <div>
-              <p className="eyebrow">The range</p>
-              <h2 className="mt-4 max-w-2xl font-display text-3xl font-semibold leading-tight sm:text-5xl">Everything a hair business needs to stock.</h2>
-            </div>
-            <Link to="/products" className="btn-ghost w-fit border-ink/20 hover:border-gold-500 hover:text-gold-600">View all products <ArrowIcon width={16} height={16} /></Link>
-          </div>
-
-          <div className="reveal mt-12 grid overflow-hidden rounded-[2rem] border border-gold-200 bg-white shadow-lift lg:grid-cols-12">
-            <div className="p-6 sm:p-10 lg:col-span-7">
-              <div role="tablist" className="flex flex-wrap gap-2">
-                {groups.map((g) => (
-                  <button key={g} role="tab" aria-selected={tab === g} onClick={() => setTab(g)}
-                    className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${tab === g ? 'bg-ink text-gold-300' : 'bg-ivory text-ink/70 hover:bg-gold-100'}`}>{g}</button>
-                ))}
+                <img src={company.logos.emblemWhite} alt="" aria-hidden="true" className="h-14 w-14 object-contain opacity-80" />
               </div>
-              <p className="mt-6 max-w-lg text-ink/70">{groupMeta[tab].line}</p>
-              <ul className="mt-6 divide-y divide-gold-100">
-                {list.map((p) => (
-                  <li key={p.slug} className="group flex items-start justify-between gap-4 py-4">
-                    <div>
-                      <h3 className="font-display text-2xl font-semibold transition-colors group-hover:text-gold-600">{p.name}</h3>
-                      <p className="mt-1 text-sm text-ink/60">{p.details.join(' · ')}</p>
-                    </div>
-                    <a href={waLink(`Hello ${company.name}, please share wholesale details for ${p.name}.`)} target="_blank" rel="noopener noreferrer" aria-label={`Enquire about ${p.name} on WhatsApp`}
-                      className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gold-300 text-gold-600 transition-all group-hover:bg-gold-400 group-hover:text-ink"><WhatsAppIcon size={16} /></a>
-                  </li>
-                ))}
-              </ul>
+              <p className="mt-5 font-display text-2xl leading-snug text-white">Made for the people who make hair their business.</p>
+              <p className="mt-3 text-sm leading-6 text-white/65">Bulk supply, finished extensions and product customisation from Alappuzha, Kerala.</p>
+              <div className="mt-6 flex items-center gap-3">
+                <div className="h-12 w-12 overflow-hidden rounded-full border border-[#d6b267]/60">
+                  <img src={images.texture} alt="" aria-hidden="true" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-white">Hairy World</p>
+                  <p className="mt-0.5 text-xs text-white/55">Original human hair wholesale</p>
+                </div>
+              </div>
             </div>
-            <div className="relative min-h-[320px] bg-ink lg:col-span-5">
-              <img key={tab} src={groupMeta[tab].img} alt={`${tab} human hair products`} loading="lazy" className="absolute inset-0 h-full w-full object-cover opacity-90" />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
-              <p className="absolute bottom-6 left-6 font-display text-3xl italic text-white">{tab}</p>
-            </div>
-          </div>
+          </aside>
         </div>
-      </section>
 
-      {/* ═════════ 5. WHY PARTNER (dark, staggered) ═════════ */}
-      <section className="relative overflow-hidden bg-ink py-20 text-white sm:py-28">
-        <img src={company.logos.emblemWhite} alt="" aria-hidden="true" className="pointer-events-none absolute -left-32 top-10 w-[520px] opacity-[0.04]" />
-        <div className="container-x relative">
-          <div className="reveal max-w-2xl">
-            <p className="eyebrow !text-gold-300">Why partner with us</p>
-            <h2 className="mt-4 font-display text-3xl font-semibold leading-tight sm:text-5xl">Four reasons buyers <span className="gold-text italic">stay</span> with us.</h2>
-          </div>
-          <div className="mt-14 grid gap-x-12 gap-y-4 md:grid-cols-2">
-            {company.whyUs.map((w, i) => (
-              <div key={w.title} className={`reveal group relative border-t border-white/15 py-8 ${i % 2 ? 'md:mt-16' : ''}`} style={{ transitionDelay: `${i * 90}ms` }}>
-                <span className="font-display text-6xl font-semibold text-gold-400/30 transition-colors group-hover:text-gold-400">0{i + 1}</span>
-                <h3 className="mt-3 font-display text-2xl font-semibold sm:text-3xl">{w.title}</h3>
-                <p className="mt-3 max-w-md text-white/65">{w.text}</p>
-                <span className="absolute left-0 top-0 h-px w-0 bg-gold-400 transition-all duration-700 group-hover:w-full" />
+        <div className="absolute bottom-0 left-0 right-0 border-t border-white/15 bg-black/25 backdrop-blur-sm">
+          <div className="container-x grid grid-cols-2 gap-4 py-4 sm:grid-cols-4 sm:py-5">
+            {[
+              ['01', 'Original human hair'],
+              ['02', 'Own stitching unit'],
+              ['03', 'Wholesale focused'],
+              ['04', 'Global markets'],
+            ].map(([number, label]) => (
+              <div key={number} className="flex items-center gap-3">
+                <span className="font-display text-sm text-[#e8c77d]">{number}</span>
+                <span className="text-[0.68rem] font-medium uppercase tracking-[0.13em] text-white/75 sm:text-xs">{label}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ═════════ 6. PROCESS (timeline) ═════════ */}
+      {/* Editorial introduction */}
+      <section className="overflow-hidden bg-[#f8f5ee] py-20 sm:py-28">
+        <div className="container-x grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
+          <div className="reveal relative lg:col-span-5">
+            <div className="relative mr-8 aspect-[4/5] overflow-hidden rounded-t-[11rem] rounded-b-[1.75rem] bg-[#e6dcc8] sm:mr-12">
+              <img
+                src={images.story}
+                alt="Beauty portrait with long, styled hair"
+                width="1000"
+                height="1250"
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full object-cover object-center transition duration-700 hover:scale-[1.03]"
+              />
+              <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 to-transparent" />
+              <p className="absolute bottom-6 left-6 font-display text-2xl italic text-white sm:text-3xl">Made with care. Supplied with confidence.</p>
+            </div>
+            <div className="absolute -bottom-5 right-0 w-36 overflow-hidden rounded-2xl border-[5px] border-[#f8f5ee] shadow-xl sm:w-44">
+              <img src={images.detail} alt="Hair styling detail" loading="lazy" decoding="async" className="aspect-[4/5] h-full w-full object-cover" />
+            </div>
+            <div className="absolute left-0 top-8 rounded-full border border-[#cdb985] bg-[#f8f5ee]/95 px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-[#705321] shadow-sm">
+              Alappuzha · Kerala
+            </div>
+          </div>
+
+          <div className="reveal lg:col-span-7">
+            <SectionEyebrow>Who we are</SectionEyebrow>
+            <h2 className="mt-5 max-w-2xl font-display text-3xl font-semibold leading-[1.08] tracking-[-0.025em] text-[#211c16] sm:text-5xl lg:text-[3.6rem]">
+              A wholesale partner built around <span className="italic text-[#9a742d]">your business.</span>
+            </h2>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-[#625a4e] sm:text-lg sm:leading-8">
+              Based in Alappuzha, Kerala, Hairy World combines industry experience with product expertise and in-house stitching. We work with buyers to find human hair products that fit their ranges, specifications and markets.
+            </p>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-[#625a4e]">
+              From bulk hair to ready-made extensions and customised pieces, our focus is on quality, competitive wholesale pricing, reliable supply and long-term business relationships.
+            </p>
+
+            <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                ['15+', 'Years in the trade'],
+                ['In-house', 'Stitching unit'],
+                ['B2B', 'Wholesale focus'],
+                ['Global', 'Market reach'],
+              ].map(([value, label]) => (
+                <div key={label} className="border-l-2 border-[#c6a45c] pl-3 py-1">
+                  <p className="font-display text-xl font-semibold text-[#211c16] sm:text-2xl">{value}</p>
+                  <p className="mt-1 text-xs leading-5 text-[#766d60]">{label}</p>
+                </div>
+              ))}
+            </div>
+            <Link to="/about" className="mt-9 inline-flex items-center gap-2 border-b border-[#b8924b] pb-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-[#755721] transition-all hover:gap-3">
+              Discover our story <ArrowIcon width={16} height={16} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Product range image cards */}
       <section className="bg-white py-20 sm:py-28">
         <div className="container-x">
-          <div className="reveal mx-auto max-w-2xl text-center">
-            <p className="eyebrow">How ordering works</p>
-            <h2 className="mt-4 font-display text-3xl font-semibold leading-tight sm:text-5xl">From first message to dispatch.</h2>
+          <div className="reveal flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <div>
+              <SectionEyebrow>Explore the range</SectionEyebrow>
+              <h2 className="mt-5 max-w-3xl font-display text-3xl font-semibold leading-[1.08] tracking-[-0.025em] text-[#211c16] sm:text-5xl">
+                The right products for every <span className="italic text-[#9a742d]">hair business.</span>
+              </h2>
+            </div>
+            <Link to="/products" className="inline-flex w-fit items-center gap-2 rounded-full border border-[#d8c9a7] px-5 py-3 text-sm font-semibold text-[#31281b] transition hover:border-[#9a742d] hover:bg-[#f8f5ee]">
+              View all products <ArrowIcon width={16} height={16} />
+            </Link>
           </div>
-          <ol className="relative mt-16 grid gap-10 md:grid-cols-5 md:gap-4">
-            <span className="absolute left-[27px] top-4 hidden h-[calc(100%-2rem)] w-px bg-gradient-to-b from-gold-300 to-gold-100 max-md:block md:left-[10%] md:right-[10%] md:top-[27px] md:h-px md:w-auto md:bg-gradient-to-r" aria-hidden="true" />
-            {steps.map(({ t, d, Icon }, i) => (
-              <li key={t} className="reveal relative flex gap-5 md:flex-col md:items-center md:gap-0 md:text-center" style={{ transitionDelay: `${i * 100}ms` }}>
-                <span className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-gold-400 bg-white text-gold-600 shadow-gold"><Icon width={22} height={22} /></span>
+
+          <div className="mt-10 grid gap-5 md:grid-cols-3 md:gap-6">
+            {groups.map((group, index) => {
+              const meta = groupMeta[group];
+              const count = products.filter((product) => product.group === group).length;
+              return (
+                <button
+                  key={group}
+                  type="button"
+                  onClick={() => {
+                    setTab(group);
+                    document.getElementById('product-showcase')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className="reveal group relative min-h-[420px] overflow-hidden rounded-[1.5rem] bg-[#1e1a14] text-left shadow-sm transition duration-500 hover:-translate-y-1 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-[#b8924b] focus:ring-offset-2"
+                  style={{ transitionDelay: `${index * 90}ms` }}
+                >
+                  <img src={meta.img} alt={meta.alt} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-black/5" />
+                  <div className="absolute left-5 top-5 rounded-full border border-white/35 bg-black/20 px-3 py-1.5 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm">
+                    {meta.eyebrow}
+                  </div>
+                  <div className="absolute inset-x-0 bottom-0 p-6 sm:p-7">
+                    <div className="mb-4 flex items-center justify-between gap-4">
+                      <span className="text-xs font-medium uppercase tracking-[0.18em] text-[#e8c77d]">Collection 0{index + 1}</span>
+                      {count > 0 && <span className="rounded-full bg-white/15 px-3 py-1 text-xs text-white backdrop-blur">{count} {count === 1 ? 'product' : 'products'}</span>}
+                    </div>
+                    <h3 className="font-display text-3xl font-semibold text-white sm:text-4xl">{group}</h3>
+                    <p className="mt-3 max-w-sm text-sm leading-6 text-white/75">{meta.line}</p>
+                    <span className="mt-6 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/45 text-white transition duration-300 group-hover:border-[#e8c77d] group-hover:bg-[#e8c77d] group-hover:text-[#211c16]">
+                      <ArrowIcon width={17} height={17} />
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Tabbed product showcase */}
+      <section id="product-showcase" className="scroll-mt-24 bg-[#f1ece1] py-20 sm:py-28">
+        <div className="container-x">
+          <div className="reveal mx-auto max-w-3xl text-center">
+            <SectionEyebrow>Wholesale product catalogue</SectionEyebrow>
+            <h2 className="mt-5 font-display text-3xl font-semibold leading-[1.08] tracking-[-0.025em] text-[#211c16] sm:text-5xl">
+              Find the range that fits your market.
+            </h2>
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-[#6b6255]">
+              Explore our product groups, then message us with your preferred styles, quantities and destination for a wholesale discussion.
+            </p>
+          </div>
+
+          <div className="reveal mt-10 overflow-hidden rounded-[1.75rem] border border-[#e0d4bb] bg-white shadow-[0_18px_70px_rgba(52,39,17,0.08)] lg:grid lg:grid-cols-12">
+            <div className="p-6 sm:p-9 lg:col-span-7 lg:p-11">
+              <div role="tablist" aria-label="Product categories" className="flex flex-wrap gap-2">
+                {groups.map((group) => (
+                  <button
+                    key={group}
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === group}
+                    onClick={() => setTab(group)}
+                    className={`rounded-full px-4 py-2.5 text-sm font-semibold transition duration-200 focus:outline-none focus:ring-2 focus:ring-[#b8924b] focus:ring-offset-2 ${tab === group ? 'bg-[#241f18] text-[#e8c77d]' : 'bg-[#f5f1e8] text-[#6c6254] hover:bg-[#ebe1cc] hover:text-[#241f18]'}`}
+                  >
+                    {group}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-7 border-b border-[#e9dfcc] pb-6">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9a742d]">{groupMeta[tab].eyebrow}</p>
+                <p className="mt-3 max-w-xl text-sm leading-6 text-[#6b6255] sm:text-base">{groupMeta[tab].line}</p>
+              </div>
+
+              {activeProducts.length > 0 ? (
+                <ul className="divide-y divide-[#eee6d8]">
+                  {activeProducts.map((product) => (
+                    <li key={product.slug ?? product.name} className="group flex items-center justify-between gap-4 py-5">
+                      <div>
+                        <h3 className="font-display text-xl font-semibold text-[#282219] transition-colors group-hover:text-[#8c6728] sm:text-2xl">{product.name}</h3>
+                        {Array.isArray(product.details) && product.details.length > 0 && (
+                          <p className="mt-1.5 text-sm leading-6 text-[#807669]">{product.details.join(' · ')}</p>
+                        )}
+                      </div>
+                      <a
+                        href={waLink(`Hello ${company.name}, please share wholesale details for ${product.name}.`)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Enquire about ${product.name} on WhatsApp`}
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#d8c18e] text-[#8a6728] transition duration-300 hover:border-[#241f18] hover:bg-[#241f18] hover:text-[#e8c77d]"
+                      >
+                        <WhatsAppIcon size={17} />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="py-8 text-sm leading-6 text-[#6b6255]">
+                  Contact us to discuss available products and custom requirements in this category.
+                </div>
+              )}
+              <a href={waLink(DEFAULT_WA_MESSAGE)} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#755721] transition-all hover:gap-3">
+                Ask for wholesale pricing <ArrowIcon width={16} height={16} />
+              </a>
+            </div>
+
+            <div className="relative min-h-[380px] overflow-hidden bg-[#211b13] lg:col-span-5 lg:min-h-full">
+              <img key={tab} src={groupMeta[tab].img} alt={groupMeta[tab].alt} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#17130f]/90 via-[#17130f]/15 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-7 sm:p-9">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#e8c77d]">Hairy World collection</p>
+                <p className="mt-3 max-w-sm font-display text-3xl font-semibold text-white sm:text-4xl">{tab}</p>
+                <p className="mt-3 max-w-sm text-sm leading-6 text-white/70">Wholesale supply and customised options for professional buyers.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why choose us */}
+      <section className="relative overflow-hidden bg-[#191612] py-20 text-white sm:py-28">
+        <img src={company.logos.emblemWhite} alt="" aria-hidden="true" loading="lazy" decoding="async" className="pointer-events-none absolute -right-32 -top-28 w-[440px] opacity-[0.045] sm:w-[560px]" />
+        <div className="container-x relative grid gap-12 lg:grid-cols-12 lg:gap-16">
+          <div className="reveal lg:col-span-5">
+            <SectionEyebrow light>Why Hairy World</SectionEyebrow>
+            <h2 className="mt-5 font-display text-3xl font-semibold leading-[1.08] tracking-[-0.025em] text-white sm:text-5xl">
+              A thoughtful approach to <span className="italic text-[#e8c77d]">wholesale.</span>
+            </h2>
+            <p className="mt-6 max-w-lg text-base leading-7 text-white/65">
+              We understand that product consistency, flexibility and communication matter when you are building a business. Our goal is to make every wholesale conversation practical and clear.
+            </p>
+            <div className="mt-8 overflow-hidden rounded-[1.5rem] border border-white/10">
+              <img src={images.salon} alt="Beauty editorial image representing hair styling and salon professionals" loading="lazy" decoding="async" className="aspect-[5/3] w-full object-cover opacity-90" />
+            </div>
+          </div>
+
+          <div className="grid gap-x-8 md:grid-cols-2 lg:col-span-7">
+            {whyUs.slice(0, 4).map((item, index) => (
+              <article key={item.title} className="reveal group border-t border-white/15 py-7 sm:py-8" style={{ transitionDelay: `${index * 80}ms` }}>
+                <span className="font-display text-5xl font-semibold text-[#d7b56b]/35 transition-colors group-hover:text-[#d7b56b]">0{index + 1}</span>
+                <h3 className="mt-3 font-display text-2xl font-semibold text-white sm:text-3xl">{item.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-white/60">{item.text}</p>
+                <span className="mt-6 block h-px w-10 bg-[#c8a258] transition-all duration-500 group-hover:w-20" />
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Image-led craft / customisation section */}
+      <section className="bg-white py-20 sm:py-28">
+        <div className="container-x grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          <div className="reveal order-2 lg:order-1">
+            <SectionEyebrow>Made for your brief</SectionEyebrow>
+            <h2 className="mt-5 font-display text-3xl font-semibold leading-[1.08] tracking-[-0.025em] text-[#211c16] sm:text-5xl">
+              Product flexibility, backed by <span className="italic text-[#9a742d]">in-house stitching.</span>
+            </h2>
+            <p className="mt-6 text-base leading-7 text-[#6b6255] sm:text-lg">
+              Need a particular style or finish? Share your specifications with our team. We can discuss clip-in and clip-on extensions, ponytails, hair buns, clutch hair, tail extensions, Tiruppan, wrapped extensions and other customised products.
+            </p>
+            <div className="mt-7 space-y-4">
+              {[
+                'Discuss product type, length and finish',
+                'Clarify quantity and wholesale requirements',
+                'Coordinate customised stitching where available',
+              ].map((item) => (
+                <div key={item} className="flex items-start gap-3 text-sm leading-6 text-[#4d453a]">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#f0e5cb] text-[#856226]"><CheckIcon width={13} height={13} /></span>
+                  {item}
+                </div>
+              ))}
+            </div>
+            <a href={waLink('Hello Hairy World, I would like to discuss a customised human hair product order.')} target="_blank" rel="noopener noreferrer" className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#211c16] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[#8b682c]">
+              Discuss a custom order <WhatsAppIcon size={18} />
+            </a>
+          </div>
+
+          <div className="reveal order-1 grid grid-cols-12 gap-3 lg:order-2">
+            <div className="col-span-7 overflow-hidden rounded-t-[8rem] rounded-b-2xl bg-[#e8dfcf]">
+              <img src={images.texture} alt="Close-up beauty image representing hair texture" loading="lazy" decoding="async" className="aspect-[4/5] h-full w-full object-cover transition duration-700 hover:scale-[1.03]" />
+            </div>
+            <div className="col-span-5 mt-12 overflow-hidden rounded-2xl bg-[#e8dfcf] sm:mt-20">
+              <img src={images.waves} alt="Fashion editorial portrait with styled hair" loading="lazy" decoding="async" className="aspect-[3/4] h-full w-full object-cover transition duration-700 hover:scale-[1.03]" />
+            </div>
+            <div className="col-span-12 flex items-center justify-between gap-5 rounded-2xl bg-[#f5f0e5] p-5 sm:p-6">
+              <div>
+                <p className="font-display text-xl font-semibold text-[#211c16] sm:text-2xl">Your product. Your requirements.</p>
+                <p className="mt-1 text-sm text-[#766d60]">Custom discussions for wholesale buyers.</p>
+              </div>
+              <ScissorsIcon width={30} height={30} className="shrink-0 text-[#9a742d]" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Ordering process */}
+      <section className="bg-[#f6f2e9] py-20 sm:py-28">
+        <div className="container-x">
+          <div className="reveal mx-auto max-w-3xl text-center">
+            <SectionEyebrow>How it works</SectionEyebrow>
+            <h2 className="mt-5 font-display text-3xl font-semibold leading-[1.08] tracking-[-0.025em] text-[#211c16] sm:text-5xl">From first enquiry to dispatch.</h2>
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-[#6b6255]">A straightforward conversation helps us understand your business, your product needs and the best next step.</p>
+          </div>
+
+          <ol className="relative mt-12 grid gap-7 sm:mt-16 md:grid-cols-5 md:gap-4">
+            <span className="absolute bottom-8 left-6 top-8 w-px bg-[#d9c38e] md:bottom-auto md:left-[10%] md:right-[10%] md:top-7 md:h-px md:w-auto" aria-hidden="true" />
+            {steps.map(({ t, d, Icon }, index) => (
+              <li key={t} className="reveal relative flex gap-4 md:flex-col md:items-center md:text-center" style={{ transitionDelay: `${index * 75}ms` }}>
+                <span className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[#c4a45d] bg-[#fffdf8] text-[#886426] shadow-[0_5px_20px_rgba(75,54,17,0.08)]">
+                  <Icon width={21} height={21} />
+                </span>
                 <div className="md:mt-5">
-                  <p className="text-[11px] font-medium uppercase tracking-[0.3em] text-gold-600">Step {i + 1}</p>
-                  <h3 className="mt-1 font-display text-2xl font-semibold">{t}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-ink/60">{d}</p>
+                  <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-[#9a742d]">Step 0{index + 1}</p>
+                  <h3 className="mt-2 font-display text-xl font-semibold text-[#211c16] sm:text-2xl">{t}</h3>
+                  <p className="mt-2 text-sm leading-6 text-[#766d60]">{d}</p>
                 </div>
               </li>
             ))}
@@ -243,83 +529,148 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═════════ 7. WHO WE SUPPLY + MARKETS ═════════ */}
-      <section className="bg-ivory-deep py-20 sm:py-28">
-        <div className="container-x grid items-center gap-12 lg:grid-cols-2">
-          <div className="reveal relative">
-            <div className="grid grid-cols-6 grid-rows-6 gap-3">
-              <img src="/images/model-curls.jpg" alt="Voluminous curled hair extensions" loading="lazy" className="col-span-4 row-span-4 h-full w-full rounded-2xl object-cover shadow-lift" />
-              <img src="/images/bundles-natural.jpg" alt="Natural wavy and curly hair bundles" loading="lazy" className="col-span-2 row-span-3 h-full w-full rounded-2xl object-cover shadow-lift" />
-              <div className="col-span-2 row-span-3 flex flex-col justify-center rounded-2xl bg-ink p-4 text-center text-white">
-                <GlobeIcon className="mx-auto text-gold-400" width={28} height={28} />
-                <p className="mt-2 font-display text-xl leading-tight">Shipping worldwide</p>
+      {/* Buyers and international reach */}
+      <section className="overflow-hidden bg-white py-20 sm:py-28">
+        <div className="container-x grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
+          <div className="reveal relative lg:col-span-6">
+            <div className="grid grid-cols-12 gap-3 sm:gap-4">
+              <div className="col-span-7 overflow-hidden rounded-[1.5rem] rounded-tl-[7rem] bg-[#e7ddca]">
+                <img src={images.ready} alt="Fashion portrait representing hair styling and extensions" loading="lazy" decoding="async" className="aspect-[4/5] h-full w-full object-cover transition duration-700 hover:scale-[1.03]" />
               </div>
-              <div className="col-span-4 row-span-2 flex items-center rounded-2xl border border-gold-300 bg-white p-5">
-                <p className="font-display text-xl leading-snug sm:text-2xl">GCC · UK · USA · Canada <span className="text-gold-600">&amp; beyond</span></p>
-              </div>
-            </div>
-          </div>
-          <div className="reveal">
-            <p className="eyebrow">Who we supply</p>
-            <h2 className="mt-4 font-display text-3xl font-semibold leading-tight sm:text-5xl">Built for people who sell hair.</h2>
-            <p className="mt-5 text-ink/70">Whether you run a salon chain, a wholesale counter or an extension brand, we supply in the quantities and specifications your business needs.</p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              {company.buyers.map((b) => (
-                <span key={b} className="rounded-full border border-gold-400/60 bg-white px-5 py-2.5 text-sm font-medium text-ink shadow-sm">{b}</span>
-              ))}
-            </div>
-            <Link to="/global-export" className="mt-9 inline-flex items-center gap-2 border-b border-gold-500 pb-1 text-sm font-medium uppercase tracking-widest text-gold-600 transition-all hover:gap-3">Our export network <ArrowIcon width={16} height={16} /></Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ═════════ 8. FAQ ═════════ */}
-      <section className="bg-white py-20 sm:py-28">
-        <div className="container-x grid gap-12 lg:grid-cols-12">
-          <div className="reveal lg:col-span-4">
-            <p className="eyebrow">Good to know</p>
-            <h2 className="mt-4 font-display text-3xl font-semibold leading-tight sm:text-5xl">Frequently asked.</h2>
-            <p className="mt-4 text-ink/60">Something else on your mind? Ask us directly on WhatsApp.</p>
-            <a href={waLink(DEFAULT_WA_MESSAGE)} target="_blank" rel="noopener noreferrer" className="btn-gold mt-6"><WhatsAppIcon size={18} /> Ask a question</a>
-          </div>
-          <div className="reveal lg:col-span-8">
-            {faqs.map((f, i) => (
-              <div key={f.q} className="border-b border-gold-200">
-                <button type="button" aria-expanded={open === i} onClick={() => setOpen(open === i ? -1 : i)} className="flex w-full items-center justify-between gap-6 py-6 text-left">
-                  <span className="font-display text-xl font-semibold sm:text-2xl">{f.q}</span>
-                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gold-400 text-gold-600 transition-transform duration-300 ${open === i ? 'rotate-45 bg-gold-400 text-ink' : ''}`}>+</span>
-                </button>
-                <div className={`grid transition-all duration-500 ${open === i ? 'grid-rows-[1fr] pb-6' : 'grid-rows-[0fr]'}`}>
-                  <p className="overflow-hidden text-ink/70">{f.a}</p>
+              <div className="col-span-5 flex flex-col gap-3 sm:gap-4">
+                <div className="overflow-hidden rounded-[1.5rem] bg-[#e7ddca]">
+                  <img src={images.raw} alt="Beauty photograph representing human hair products" loading="lazy" decoding="async" className="aspect-[4/5] h-full w-full object-cover transition duration-700 hover:scale-[1.03]" />
+                </div>
+                <div className="flex flex-1 flex-col justify-center rounded-[1.5rem] bg-[#211c16] p-4 text-white sm:p-5">
+                  <GlobeIcon width={27} height={27} className="text-[#e8c77d]" />
+                  <p className="mt-4 font-display text-xl leading-snug sm:text-2xl">Serving buyers beyond borders.</p>
                 </div>
               </div>
-            ))}
+              <div className="col-span-12 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#e8ddc6] bg-[#f8f5ee] p-5 sm:p-6">
+                <div>
+                  <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[#94702d]">Our markets</p>
+                  <p className="mt-2 font-display text-xl font-semibold text-[#211c16] sm:text-2xl">India · GCC · UK · USA · Canada</p>
+                </div>
+                <GlobeIcon width={30} height={30} className="text-[#a17a31]" />
+              </div>
+            </div>
+          </div>
+
+          <div className="reveal lg:col-span-6">
+            <SectionEyebrow>Who we serve</SectionEyebrow>
+            <h2 className="mt-5 font-display text-3xl font-semibold leading-[1.08] tracking-[-0.025em] text-[#211c16] sm:text-5xl">
+              Built for people who <span className="italic text-[#9a742d]">sell hair.</span>
+            </h2>
+            <p className="mt-6 text-base leading-7 text-[#6b6255] sm:text-lg">
+              Whether you manage a salon, wholesale counter, retail business or extension brand, we can discuss the products and quantities that suit your business needs.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-2.5">
+              {buyers.map((buyer) => (
+                <span key={buyer} className="rounded-full border border-[#dfd1b3] bg-[#fbf9f4] px-4 py-2.5 text-sm font-medium text-[#4d453a]">{buyer}</span>
+              ))}
+            </div>
+            <div className="mt-8 grid grid-cols-2 gap-4 border-y border-[#e7dece] py-6">
+              <div>
+                <p className="font-display text-2xl font-semibold text-[#211c16]">15+ years</p>
+                <p className="mt-1 text-sm text-[#766d60]">Industry experience</p>
+              </div>
+              <div>
+                <p className="font-display text-2xl font-semibold text-[#211c16]">Made-to-brief</p>
+                <p className="mt-1 text-sm text-[#766d60]">Custom product discussions</p>
+              </div>
+            </div>
+            <Link to="/global-export" className="mt-8 inline-flex items-center gap-2 border-b border-[#b8924b] pb-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-[#755721] transition-all hover:gap-3">
+              Explore our export network <ArrowIcon width={16} height={16} />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ═════════ 9. WHATSAPP CTA ═════════ */}
-      <section className="px-4 pb-20 sm:px-8 sm:pb-28">
-        <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-gradient-to-br from-gold-300 via-gold-400 to-gold-600 p-8 sm:p-14">
-          <img src={company.logos.emblem} alt="" aria-hidden="true" className="pointer-events-none absolute -right-20 -top-20 w-[380px] opacity-20 mix-blend-overlay" />
-          <div className="relative grid items-center gap-8 lg:grid-cols-2">
-            <div>
-              <h2 className="font-display text-3xl font-semibold leading-tight text-ink sm:text-5xl">Tell us what you need. We'll reply on WhatsApp.</h2>
-              <p className="mt-4 max-w-md text-ink/75">Pick a topic to open a pre-written message, or write your own.</p>
+      {/* FAQ */}
+      <section className="bg-[#f8f5ee] py-20 sm:py-28">
+        <div className="container-x grid gap-10 lg:grid-cols-12 lg:gap-16">
+          <div className="reveal lg:col-span-4">
+            <SectionEyebrow>Good to know</SectionEyebrow>
+            <h2 className="mt-5 font-display text-3xl font-semibold leading-[1.08] tracking-[-0.025em] text-[#211c16] sm:text-5xl">Frequently asked.</h2>
+            <p className="mt-5 text-base leading-7 text-[#6b6255]">Need a product detail or wholesale quote? Talk to our team directly.</p>
+            <a href={waLink(DEFAULT_WA_MESSAGE)} target="_blank" rel="noopener noreferrer" className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#211c16] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#8b682c]">
+              <WhatsAppIcon size={18} /> Ask us on WhatsApp
+            </a>
+            <div className="mt-9 hidden overflow-hidden rounded-[1.5rem] lg:block">
+              <img src={images.detail} alt="Beauty editorial image" loading="lazy" decoding="async" className="aspect-[5/3] w-full object-cover" />
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
+          </div>
+
+          <div className="reveal lg:col-span-8">
+            {faqs.map((faq, index) => {
+              const isOpen = openFaq === index;
+              const answerId = `home-faq-answer-${index}`;
+              return (
+                <div key={faq.q} className="border-b border-[#dfd3bb] first:border-t">
+                  <button
+                    type="button"
+                    aria-expanded={isOpen}
+                    aria-controls={answerId}
+                    onClick={() => setOpenFaq(isOpen ? -1 : index)}
+                    className="flex w-full items-center justify-between gap-6 py-5 text-left sm:py-6"
+                  >
+                    <span className="font-display text-xl font-semibold text-[#211c16] sm:text-2xl">{faq.q}</span>
+                    <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#c9ad70] text-xl font-light text-[#856226] transition duration-300 ${isOpen ? 'rotate-45 bg-[#d6b267] text-[#211c16]' : ''}`} aria-hidden="true">+</span>
+                  </button>
+                  <div id={answerId} hidden={!isOpen} className="pb-6 pr-10 text-sm leading-7 text-[#6b6255] sm:text-base">
+                    {faq.a}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Contact CTA */}
+      <section className="px-4 py-16 sm:px-8 sm:py-24">
+        <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-[#211c16] text-white">
+          <img src={images.hero} alt="" aria-hidden="true" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover object-center opacity-25" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#17130f]/95 via-[#211c16]/90 to-[#211c16]/65" />
+          <div className="pointer-events-none absolute -right-20 -top-24 h-80 w-80 rounded-full border border-[#d6b267]/20" />
+          <div className="pointer-events-none absolute -right-10 -top-14 h-60 w-60 rounded-full border border-[#d6b267]/15" />
+
+          <div className="relative grid gap-9 p-7 sm:p-10 md:p-14 lg:grid-cols-12 lg:items-center lg:gap-12">
+            <div className="lg:col-span-6">
+              <SectionEyebrow light>Start a conversation</SectionEyebrow>
+              <h2 className="mt-5 font-display text-3xl font-semibold leading-[1.08] tracking-[-0.025em] text-white sm:text-5xl">
+                Tell us what your business needs.
+              </h2>
+              <p className="mt-5 max-w-xl text-base leading-7 text-white/70">
+                Share the product, quantity and destination you have in mind. We’ll help you explore suitable wholesale options.
+              </p>
+              <a href={waLink(DEFAULT_WA_MESSAGE)} target="_blank" rel="noopener noreferrer" className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-full bg-[#d6b267] px-6 py-3 text-sm font-semibold text-[#211c16] transition hover:bg-[#efda9e]">
+                <WhatsAppIcon size={18} /> Get in touch
+              </a>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2 lg:col-span-6">
               {[
-                ['Bulk & drawn hair rates', 'Hello, I would like wholesale rates for bulk / drawn human hair.'],
-                ['Clip-in / clip-on sets', 'Hello, I would like wholesale details for clip-in and clip-on extensions.'],
-                ['Custom stitching order', 'Hello, I would like to discuss a custom hair product order.'],
-                ['Export / shipping', 'Hello, I would like to know about export and shipping to my country.'],
-              ].map(([l, m]) => (
-                <a key={l} href={waLink(m)} target="_blank" rel="noopener noreferrer" className="group flex items-center justify-between gap-3 rounded-2xl bg-ink px-5 py-4 text-sm font-medium text-white transition-all hover:-translate-y-1 hover:shadow-lift">
-                  {l}<WhatsAppIcon size={18} className="text-[#25D366] transition-transform group-hover:scale-125" />
+                ['Bulk & drawn hair', 'Hello Hairy World, please share wholesale rates for bulk and drawn human hair.'],
+                ['Clip-in & clip-on', 'Hello Hairy World, please share wholesale details for clip-in and clip-on extensions.'],
+                ['Custom stitching', 'Hello Hairy World, I would like to discuss a customised human hair product order.'],
+                ['Export & shipping', 'Hello Hairy World, I would like to discuss wholesale supply and shipping to my country.'],
+              ].map(([label, message]) => (
+                <a key={label} href={waLink(message)} target="_blank" rel="noopener noreferrer" className="group flex min-h-[78px] items-center justify-between gap-4 rounded-2xl border border-white/15 bg-white/[0.06] px-5 py-4 text-sm font-medium text-white transition duration-300 hover:-translate-y-0.5 hover:border-[#d6b267]/70 hover:bg-white/[0.1]">
+                  <span>{label}</span>
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#d6b267]/15 text-[#e8c77d] transition group-hover:bg-[#d6b267] group-hover:text-[#211c16]"><WhatsAppIcon size={17} /></span>
                 </a>
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Compact contact strip */}
+      <section className="border-t border-[#e5dac3] bg-white py-8">
+        <div className="container-x flex flex-col gap-3 text-sm text-[#6b6255] sm:flex-row sm:items-center sm:justify-between">
+          <p><span className="font-semibold text-[#211c16]">Hairy World</span> · Avalookkunnu P.O., Alappuzha – 688006, Kerala, India</p>
+          <a href={`tel:${company.phoneRaw ?? company.phone}`} className="font-semibold text-[#755721] hover:underline">{company.phone}</a>
         </div>
       </section>
     </>
