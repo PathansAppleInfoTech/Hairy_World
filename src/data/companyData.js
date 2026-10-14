@@ -16,11 +16,11 @@ const company = {
   yearsExperience: 15,
 
   // ── Contact (DEMO – replace before launch) ──
-  phone: '+91 98765 43210',
-  phoneRaw: '+919876543210',
-  whatsappNumber: '919876543210', // country code + number, no "+" or spaces
+  phone: '+91 79077 04987',
+  phoneRaw: '+917907704987',
+  whatsappNumber: '917907704987', // country code + number, no "+" or spaces
   email: 'info@hairyworld.in',
-  salesEmail: 'wholesale@hairyworld.in',
+  salesEmail: 'hairexport@hairyworld.in',
   hours: 'Mon – Sat, 9:30 AM – 6:30 PM IST',
 
   address: {
