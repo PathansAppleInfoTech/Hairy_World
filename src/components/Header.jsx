@@ -117,8 +117,7 @@ export default function Header() {
 
           <div className="ml-auto flex shrink-0 items-center justify-self-end gap-3">
             <a
-              href={waLink(DEFAULT_WA_MESSAGE)}
-              target="_blank"
+              href='/wholesale-enquiry'
               rel="noopener noreferrer"
               className="group hidden items-center gap-2.5 rounded-full bg-ink px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.13em] text-white xl:px-5 shadow-[0_6px_18px_-10px_rgba(15,17,19,.65)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#292b2c] hover:shadow-lg sm:inline-flex"
             >
